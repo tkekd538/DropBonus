@@ -79,6 +79,4 @@ public class BlockBonusBlockListener extends BlockListener
         
         return result;
     }
-
-    
 }
