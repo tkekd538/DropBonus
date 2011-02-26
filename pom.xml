@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <name>Minecraft - BlockBonus</name>
+  <groupId>com.nohupgaming.minecraft</groupId>
+  <artifactId>BlockBonus</artifactId>
+  <version>1.0</version>
+  <packaging>jar</packaging>  
+
+  <repositories>
+    <repository>
+      <id>nohups</id>
+      <url>http://nohupgaming.com/m2repo</url>
+    </repository>
+  </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>bukkit</artifactId>
+      <version>0.0.1-412</version>
+      <scope>compile</scope>      
+    </dependency>
+<!-- 
+    <dependency>
+      <groupId>org.bukkit</groupId>
+      <artifactId>craftbukkit</artifactId>
+      <version>0.0.1-432</version>
+      <scope>compile</scope>      
+    </dependency>
+ -->    
+  </dependencies>
+    
+  <build>
+    <directory>target</directory>
+    <outputDirectory>target/classes</outputDirectory>
+    <finalName>${artifactId}</finalName>
+    <sourceDirectory>src/main/java</sourceDirectory>    
+    <plugins>
+      <plugin>
+        <artifactId>maven-compiler-plugin</artifactId>        
+        <inherited>true</inherited>
+        <configuration>
+          <source>1.5</source>
+          <target>1.5</target>
+        </configuration>
+      </plugin>
+    </plugins>    
+  </build>    
+</project>

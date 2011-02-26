@@ -1,0 +1,5 @@
+name: BlockBonus
+main: com.nohupgaming.minecraft.BlockBonus
+version: 1.0
+description: Configurable chance at a bonus drop from broken blocks
+author: Nohup
