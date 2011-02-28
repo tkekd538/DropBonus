@@ -15,4 +15,7 @@ public class Constants
     public static String BONUS_STONE_COAL = "bonuses.stone.chances.coal_ore";
     public static String BONUS_STONE_LAPIS = "bonuses.stone.chances.lapis_ore";
     public static String BONUS_STONE_MOSS = "bonuses.stone.chances.mossy_cobblestone";
+    
+    public static String BONUS_CHICKEN_CHANCE = "bonuses.chicken.probability";
+    public static String BONUS_CHICKEN_EGG = "bonuses.chicken.chances.egg";
 }

@@ -2,9 +2,9 @@
 
 <project>
   <modelVersion>4.0.0</modelVersion>
-  <name>Minecraft - BlockBonus</name>
+  <name>Minecraft - DropBonus</name>
   <groupId>com.nohupgaming.minecraft</groupId>
-  <artifactId>BlockBonus</artifactId>
+  <artifactId>DropBonus</artifactId>
   <version>1.0</version>
   <packaging>jar</packaging>  
 

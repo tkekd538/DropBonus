@@ -1,5 +1,5 @@
-name: BlockBonus
-main: com.nohupgaming.minecraft.BlockBonus
+name: DropBonus
+main: com.nohupgaming.minecraft.DropBonus
 version: 1.0
-description: Configurable chance at a bonus drop from broken blocks
+description: Configurable chance at a bonus drop from broken blocks and dying entities
 author: Nohup
