@@ -18,7 +18,7 @@ public class DropBonusUtil
         
         if (opt > 0)
         {
-            long roll = Math.round(p.getGenerator().nextDouble() * 100);
+            double roll = p.getGenerator().nextDouble() * 100;
             return (roll > 0 && roll <= opt);
         }
         
@@ -39,7 +39,7 @@ public class DropBonusUtil
 
             if (opt > 0)
             {
-                long roll = Math.round(p.getGenerator().nextDouble() * 100);                
+                double roll = p.getGenerator().nextDouble() * 100;                
                 if (roll > 0 && roll <= opt)
                 {
                     result.add(new ItemStack(m, 1));
@@ -66,19 +66,16 @@ public class DropBonusUtil
     private static String determinePath(Object o, String suffix)
     {
         String path = null;
-        System.out.println(o.getClass().getName());
+
         if (o instanceof Block)
         {
             path = "bonuses." + ((Block) o).getType().toString()
                 .toLowerCase() + suffix;
-            
-            System.out.println("Path: " + path);
         }
         else if (o instanceof Entity)
         {
             path = "bonuses." + ((Entity) o).toString()
                 .toLowerCase() + suffix;
-            System.out.println("Path: " + path);
         }
         
         return path;
