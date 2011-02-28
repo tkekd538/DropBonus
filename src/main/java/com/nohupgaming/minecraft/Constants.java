@@ -16,6 +16,9 @@ public class Constants
     public static String BONUS_STONE_LAPIS = "bonuses.stone.chances.lapis_ore";
     public static String BONUS_STONE_MOSS = "bonuses.stone.chances.mossy_cobblestone";
     
-    public static String BONUS_CHICKEN_CHANCE = "bonuses.chicken.probability";
-    public static String BONUS_CHICKEN_EGG = "bonuses.chicken.chances.egg";
+    public static String BONUS_CHICKEN_CHANCE = "bonuses.craftchicken.probability";
+    public static String BONUS_CHICKEN_EGG = "bonuses.craftchicken.chances.egg";
+    
+    public static String BONUS_PROBABILITY_SUFFIX = ".probability";
+    public static String BONUS_CHANCES_SUFFIX = ".chances";
 }

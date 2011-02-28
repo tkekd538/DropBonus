@@ -13,7 +13,7 @@ public class DropBonusUtil
 {
     public static boolean hasBonus(DropBonus p, Object target)
     {        
-        String path = determinePath(target);
+        String path = determinePath(target, Constants.BONUS_PROBABILITY_SUFFIX);
         double opt = checkBounds(p.getConfiguration().getDouble(path, 0));
         
         if (opt > 0)
@@ -27,7 +27,7 @@ public class DropBonusUtil
     
     public static List<ItemStack> generateBonus(DropBonus p, Object target)
     {
-        String path = determinePath(target);
+        String path = determinePath(target, Constants.BONUS_CHANCES_SUFFIX);
         Configuration c = p.getConfiguration();
 
         List<ItemStack> result = new ArrayList<ItemStack>();
@@ -63,19 +63,22 @@ public class DropBonusUtil
         return result;
     }
     
-    private static String determinePath(Object o)
+    private static String determinePath(Object o, String suffix)
     {
         String path = null;
-        
+        System.out.println(o.getClass().getName());
         if (o instanceof Block)
         {
             path = "bonuses." + ((Block) o).getType().toString()
-                .toLowerCase() + ".probability";
+                .toLowerCase() + suffix;
+            
+            System.out.println("Path: " + path);
         }
         else if (o instanceof Entity)
         {
             path = "bonuses." + ((Entity) o).toString()
-                .toLowerCase() + ".probability";
+                .toLowerCase() + suffix;
+            System.out.println("Path: " + path);
         }
         
         return path;

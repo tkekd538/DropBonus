@@ -9,15 +9,18 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
 import com.nohupgaming.minecraft.listener.block.DropBonusBlockListener;
+import com.nohupgaming.minecraft.listener.entity.DropBonusEntityListener;
 
 public class DropBonus extends JavaPlugin 
 {
     private DropBonusBlockListener _bl;
+    private DropBonusEntityListener _el;
     private Random _gen;
     
     public DropBonus()
     {
         _bl = new DropBonusBlockListener(this);
+        _el = new DropBonusEntityListener(this);
         _gen = new Random();
     }
     
@@ -35,6 +38,7 @@ public class DropBonus extends JavaPlugin
         
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
+        pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
         System.out.println("BlockBonus has been enabled.");
     }
     
