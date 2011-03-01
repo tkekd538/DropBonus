@@ -38,6 +38,7 @@ public class DropBonus extends JavaPlugin
         
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
+        pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
         System.out.println("BlockBonus has been enabled.");
     }
