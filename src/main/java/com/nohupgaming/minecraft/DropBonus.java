@@ -26,7 +26,7 @@ public class DropBonus extends JavaPlugin
     
     public void onDisable() 
     {
-        System.out.println("BlockBonus has been disabled.");
+        System.out.println("DropBonus has been disabled.");
     }
 
     public void onEnable() 
@@ -38,9 +38,10 @@ public class DropBonus extends JavaPlugin
         
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
+        pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
-        System.out.println("BlockBonus has been enabled.");
+        System.out.println("DropBonus has been enabled.");
     }
     
     protected void buildConfiguration() 
@@ -60,6 +61,7 @@ public class DropBonus extends JavaPlugin
             c.setProperty(Constants.BONUS_STONE_COAL, 1);
             c.setProperty(Constants.BONUS_STONE_LAPIS, 1);
             c.setProperty(Constants.BONUS_STONE_MOSS, 1);
+            c.setProperty(Constants.BONUS_STONE_OVERRIDE, false);
             
             c.setProperty(Constants.BONUS_CHICKEN_CHANCE, 99.9);
             c.setProperty(Constants.BONUS_CHICKEN_EGG, 99.9);

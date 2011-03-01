@@ -15,10 +15,13 @@ public class Constants
     public static String BONUS_STONE_COAL = "bonuses.stone.chances.coal_ore";
     public static String BONUS_STONE_LAPIS = "bonuses.stone.chances.lapis_ore";
     public static String BONUS_STONE_MOSS = "bonuses.stone.chances.mossy_cobblestone";
+    public static String BONUS_STONE_OVERRIDE = "bonuses.stone.override";
     
     public static String BONUS_CHICKEN_CHANCE = "bonuses.craftchicken.probability";
     public static String BONUS_CHICKEN_EGG = "bonuses.craftchicken.chances.egg";
     
-    public static String BONUS_PROBABILITY_SUFFIX = ".probability";
+    public static String BONUS_PREFIX = "bonuses.";
     public static String BONUS_CHANCES_SUFFIX = ".chances";
+    public static String BONUS_OVERRIDE_SUFFIX = ".override";
+    public static String BONUS_PROBABILITY_SUFFIX = ".probability";
 }

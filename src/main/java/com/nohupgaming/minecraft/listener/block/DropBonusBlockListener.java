@@ -1,6 +1,8 @@
 package com.nohupgaming.minecraft.listener.block;
 
 
+import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 
@@ -18,10 +20,18 @@ public class DropBonusBlockListener extends BlockListener
     
     @Override
     public void onBlockBreak(BlockBreakEvent event) 
-    {
-        if (DropBonusUtil.hasBonus(_plugin, event.getBlock()))
+    {        
+        Block b = event.getBlock();
+        
+        if (DropBonusUtil.hasBonus(_plugin, b))
         {
-            DropBonusUtil.generateBonus(_plugin, event.getBlock());
+            DropBonusUtil.generateBonus(_plugin, b);
         }
+        
+        if (DropBonusUtil.isOverride(_plugin, b))
+        {
+            b.setType(Material.AIR);
+        }
+        
     }    
 }

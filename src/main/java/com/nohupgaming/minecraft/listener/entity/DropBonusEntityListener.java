@@ -51,6 +51,11 @@ public class DropBonusEntityListener extends EntityListener
             {
                 DropBonusUtil.generateBonus(_plugin, e);
             }
+            
+            if (DropBonusUtil.isOverride(_plugin, e))
+            {
+                event.getDrops().clear();
+            }
 
             _killed.remove(e);
         }

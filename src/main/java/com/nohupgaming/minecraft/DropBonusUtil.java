@@ -11,6 +11,12 @@ import org.bukkit.util.config.Configuration;
 
 public class DropBonusUtil 
 {
+    public static boolean isOverride(DropBonus p, Object target)
+    {
+        return p.getConfiguration().getBoolean(
+            determinePath(target, Constants.BONUS_OVERRIDE_SUFFIX), false);
+    }
+    
     public static boolean hasBonus(DropBonus p, Object target)
     {        
         String path = determinePath(target, Constants.BONUS_PROBABILITY_SUFFIX);
