@@ -1,7 +1,10 @@
 package com.nohupgaming.minecraft;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
+import org.bukkit.Material;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -21,7 +24,6 @@ public class DropBonus extends JavaPlugin
     {
         _bl = new DropBonusBlockListener(this);
         _el = new DropBonusEntityListener(this);
-        _gen = new Random();
     }
     
     public void onDisable() 
@@ -49,22 +51,48 @@ public class DropBonus extends JavaPlugin
         Configuration c = getConfiguration();
         if (c != null)
         {
-            c.setProperty(Constants.BONUS_STONE_CHANCE, 20);
-            c.setProperty(Constants.BONUS_STONE_COBBLE, 100);
-            c.setProperty(Constants.BONUS_STONE_DIRT, 1);
-            c.setProperty(Constants.BONUS_STONE_OBSIDIAN, .1);
-            c.setProperty(Constants.BONUS_STONE_DIAMOND, 1);
-            c.setProperty(Constants.BONUS_STONE_REDSTONE, 1);
-            c.setProperty(Constants.BONUS_STONE_GRAVEL, 1);
-            c.setProperty(Constants.BONUS_STONE_GOLD, 1);
-            c.setProperty(Constants.BONUS_STONE_IRON, 1);
-            c.setProperty(Constants.BONUS_STONE_COAL, 1);
-            c.setProperty(Constants.BONUS_STONE_LAPIS, 1);
-            c.setProperty(Constants.BONUS_STONE_MOSS, 1);
-            c.setProperty(Constants.BONUS_STONE_OVERRIDE, false);
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() + 
+                Constants.BONUS_PROBABILITY_SUFFIX, 20);
             
-            c.setProperty(Constants.BONUS_CHICKEN_CHANCE, 99.9);
-            c.setProperty(Constants.BONUS_CHICKEN_EGG, 99.9);
+            List<Double> vals = new ArrayList<Double>();
+            vals.add(new Double(100));
+            vals.add(new Double(100));                        
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() +
+                Constants.BONUS_CHANCES_BRIDGE + 
+                Material.COBBLESTONE.toString().toLowerCase(), vals);
+            
+            String valarr = ".1 0 1";
+            
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() +
+                Constants.BONUS_CHANCES_BRIDGE + 
+                Material.OBSIDIAN.toString().toLowerCase(), valarr);
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() + 
+                Constants.BONUS_OVERRIDE_SUFFIX, false);
+            
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() +
+                Constants.BONUS_TOOL_BRIDGE +
+                Material.DIAMOND_PICKAXE.toString().toLowerCase() + 
+                Constants.BONUS_CHANCES_BRIDGE +
+                Material.STONE.toString().toLowerCase()
+                , 100);
+
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Material.STONE.toString().toLowerCase() +
+                Constants.BONUS_MAXNUMBER_SUFFIX
+                , -1);
+            
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Constants.CRAFTCHICKEN +
+                Constants.BONUS_PROBABILITY_SUFFIX, 99.9);
+            c.setProperty(Constants.BONUS_PREFIX + 
+                Constants.CRAFTCHICKEN +
+                Constants.BONUS_CHANCES_BRIDGE + 
+                Material.EGG.toString().toLowerCase(), 99.9);
 
             if (!c.save())
             {
