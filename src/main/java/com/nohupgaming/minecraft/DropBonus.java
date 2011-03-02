@@ -2,7 +2,6 @@ package com.nohupgaming.minecraft;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import org.bukkit.Material;
 import org.bukkit.event.Event.Priority;
@@ -11,6 +10,8 @@ import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
+import com.nijiko.permissions.PermissionHandler;
+import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nohupgaming.minecraft.listener.block.DropBonusBlockListener;
 import com.nohupgaming.minecraft.listener.entity.DropBonusEntityListener;
 
@@ -18,12 +19,13 @@ public class DropBonus extends JavaPlugin
 {
     private DropBonusBlockListener _bl;
     private DropBonusEntityListener _el;
-    private Random _gen;
+    private PermissionHandler _permissions;
     
     public DropBonus()
     {
         _bl = new DropBonusBlockListener(this);
         _el = new DropBonusEntityListener(this);
+        _permissions = null;
     }
     
     public void onDisable() 
@@ -43,7 +45,20 @@ public class DropBonus extends JavaPlugin
         pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
+        
+        
+        if (pm.getPlugin(Constants.PERMISSIONS) != null)
+        {
+            Permissions perm = (Permissions) pm.getPlugin(Permissions.name);
+            _permissions = perm.getHandler(); 
+        }
+        
         System.out.println("DropBonus has been enabled.");
+    }
+    
+    public PermissionHandler getPermissionHandler()
+    {
+        return _permissions;
     }
     
     protected void buildConfiguration() 
@@ -100,10 +115,4 @@ public class DropBonus extends JavaPlugin
             }
         }
     }
-    
-    public Random getGenerator()
-    {
-        return _gen;
-    }
-    
 }

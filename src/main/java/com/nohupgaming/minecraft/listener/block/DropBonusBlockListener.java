@@ -23,7 +23,7 @@ public class DropBonusBlockListener extends BlockListener
     {        
         Block b = event.getBlock();
         
-        if (DropBonusUtil.hasBonus(_plugin, b))
+        if (DropBonusUtil.hasBonus(_plugin, event.getPlayer(), b))
         {
             DropBonusUtil.generateBonus(_plugin, event.getPlayer(), b);
         }

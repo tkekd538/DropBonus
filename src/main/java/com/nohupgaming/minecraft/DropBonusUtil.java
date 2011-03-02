@@ -56,11 +56,11 @@ public class DropBonusUtil
             determinePath(target, Constants.BONUS_OVERRIDE_SUFFIX), false);
     }
     
-    public static boolean hasBonus(DropBonus p, Object target)
+    public static boolean hasBonus(DropBonus p, Player pl, Object target)
     {        
         String path = determinePath(target, Constants.BONUS_PROBABILITY_SUFFIX);
         double opt = checkBounds(p.getConfiguration().getDouble(path, 0));        
-        return rollPassed(opt);
+        return hasPermission(p, pl, path) && rollPassed(opt);
     }
     
     public static List<ItemStack> generateBonus(DropBonus p, Player pl, Object target)
@@ -75,17 +75,25 @@ public class DropBonusUtil
         
         // Determine tool-specific bonuses
         if (pl != null)
-        {
+        {            
             path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
-                pl.getItemInHand().getType().toString().toLowerCase() + 
-                Constants.BONUS_CHANCES_BRIDGE);
+                pl.getItemInHand().getType().toString().toLowerCase());
             
-            buildBonus(c, path, max, result);
+            if (hasPermission(p, pl, path))
+            {
+                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                    pl.getItemInHand().getType().toString().toLowerCase() + 
+                    Constants.BONUS_CHANCES_BRIDGE);
+                buildBonus(c, path, max, result);
+            }
         }
                 
         // Determine overall level bonuses
         path = determinePath(target, Constants.BONUS_CHANCES_BRIDGE);                
-        buildBonus(c, path, max, result);
+        if (hasPermission(p, pl, path))
+        {
+            buildBonus(c, path, max, result);
+        }
         
         for (ItemStack stack : result)
         {
@@ -146,6 +154,16 @@ public class DropBonusUtil
     {
         double roll = getGenerator().nextDouble() * 100;                
         return (val > 0 && roll > 0 && roll <= val);
+    }
+    
+    private static boolean hasPermission(DropBonus p, Player pl, String path)
+    {
+        if (p.getPermissionHandler() != null && pl != null)
+        {
+            return p.getPermissionHandler().has(pl, path);
+        }
+        
+        return true;
     }
     
     private static boolean hasRoom(int max, int size)

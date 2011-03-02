@@ -12,4 +12,6 @@ public class Constants
     public static String BONUS_MAXNUMBER_SUFFIX = ".maxcount";
     
     public static String CRAFTCHICKEN = "craftchicken";
+    
+    public static String PERMISSIONS = "Permissions";
 }
