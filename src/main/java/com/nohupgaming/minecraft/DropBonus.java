@@ -20,6 +20,7 @@ public class DropBonus extends JavaPlugin
     private DropBonusBlockListener _bl;
     private DropBonusEntityListener _el;
     private PermissionHandler _permissions;
+    private boolean _iConomy = false;
     
     public DropBonus()
     {
@@ -44,13 +45,17 @@ public class DropBonus extends JavaPlugin
         pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
-        pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
-        
+        pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);        
         
         if (pm.getPlugin(Constants.PERMISSIONS) != null)
         {
             Permissions perm = (Permissions) pm.getPlugin(Permissions.name);
             _permissions = perm.getHandler(); 
+        }
+        
+        if (pm.getPlugin(Constants.ICONOMY) != null)
+        {
+            _iConomy = true;
         }
         
         System.out.println("DropBonus has been enabled.");
@@ -59,6 +64,11 @@ public class DropBonus extends JavaPlugin
     public PermissionHandler getPermissionHandler()
     {
         return _permissions;
+    }
+    
+    public boolean hasIConomy()
+    {
+        return _iConomy;
     }
     
     protected void buildConfiguration() 

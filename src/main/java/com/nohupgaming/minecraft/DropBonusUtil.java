@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -12,15 +13,22 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.util.config.Configuration;
 
+import com.nijiko.coelho.iConomy.iConomy;
+import com.nijiko.coelho.iConomy.system.Account;
+
 public class DropBonusUtil 
 {
     private static Random _gen;
+    
+    private static boolean _bankErr = false;
+    private static boolean _materialErr = false;
     
     private static class ChanceValues
     {
         double _pct;
         int _min;
         int _max;
+        byte _data;
         
         public ChanceValues(String s)
         {
@@ -32,6 +40,8 @@ public class DropBonusUtil
             
             int testMax = st.hasMoreTokens() ? Integer.parseInt(st.nextToken()) : 1; 
             _max = testMax < _min ? _min : testMax;             
+
+            _data = st.hasMoreTokens() ? Byte.parseByte(st.nextToken()) : 0;             
         }
         
         public double getPercentage()
@@ -47,6 +57,11 @@ public class DropBonusUtil
         public int getMaximum()
         {
             return _max;
+        }
+        
+        public byte getDataValue()
+        {
+            return _data;
         }
     }
     
@@ -83,10 +98,26 @@ public class DropBonusUtil
             {
                 path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
                     pl.getItemInHand().getType().toString().toLowerCase() + 
+                    Constants.BONUS_COINS_SUFFIX);
+                
+                // Determine tool-specific bank adjustment
+                if (p.hasIConomy()) affectBank(c, pl, path);
+                
+                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                    pl.getItemInHand().getType().toString().toLowerCase() + 
                     Constants.BONUS_CHANCES_BRIDGE);
                 buildBonus(c, path, max, result);
+                
+                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                    pl.getItemInHand().getType().toString().toLowerCase() + 
+                    Constants.BONUS_TOOLDAMAGE_SUFFIX);
+                affectTool(c, pl, path);
             }
         }
+        
+        // Determine overall level bank adjustment
+        path = determinePath(target, Constants.BONUS_COINS_SUFFIX);        
+        if (p.hasIConomy()) affectBank(c, pl, path);        
                 
         // Determine overall level bonuses
         path = determinePath(target, Constants.BONUS_CHANCES_BRIDGE);                
@@ -162,7 +193,6 @@ public class DropBonusUtil
         {
             return p.getPermissionHandler().has(pl, path);
         }
-        
         return true;
     }
     
@@ -181,6 +211,58 @@ public class DropBonusUtil
         return _gen;
     }
     
+    private static void affectBank(Configuration c, Player pl, String path)
+    {
+        try
+        {
+            if (c.getString(path) != null)
+            {
+                ChanceValues v = new ChanceValues(c.getString(path));
+                
+                double opt = checkBounds(v.getPercentage());
+                if (rollPassed(opt))
+                {
+                    int amt = checkMinMax(getGenerator().nextInt(v.getMaximum() + 1), v);
+                    if(iConomy.getBank().hasAccount(pl.getName())) 
+                    {
+                        Account account = iConomy.getBank().getAccount(pl.getName());
+                        account.add(amt);
+                        account.save();
+                       
+                        if(amt > 0) 
+                        {
+                            pl.sendMessage(ChatColor.GREEN + "You are rewarded " 
+                                + ChatColor.WHITE + iConomy.getBank().format(amt));
+                        } 
+                        else if(amt < 0) 
+                        {
+                            pl.sendMessage(ChatColor.RED + "You are penalized " 
+                                + ChatColor.WHITE + iConomy.getBank().format(amt));
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            if (!_bankErr)
+            {
+                System.out.println("DropBonus : Unable to apply bank bonuses : " + e.getMessage());
+                _bankErr = true;
+            }
+        }
+    }
+    
+    private static void affectTool(Configuration c, Player pl, String path)
+    {
+        if (c.getString(path) != null)
+        {
+            ItemStack target = pl.getItemInHand();
+            target.setDurability((short) (target.getDurability() + 
+                 c.getInt(path, 0)));
+        }
+    }
+    
     private static void buildBonus(Configuration c, String path, int max, List<ItemStack> result)
     {
         if (c.getKeys(path) != null)
@@ -189,44 +271,71 @@ public class DropBonusUtil
             {
                 Material m = Material.getMaterial(key.toUpperCase());
                 
-                if (c.getList(path + key) != null)
+                if (m != null)
                 {
-                    for (Object d : c.getList(path + key))
+                    if (c.getList(path + key) != null)
                     {
-                        ChanceValues v = new ChanceValues(d.toString());
+                        for (Object d : c.getList(path + key))
+                        {
+                            ChanceValues v = new ChanceValues(d.toString());
+                            double opt = checkBounds(v.getPercentage());
+                            
+                            if (rollPassed(opt))
+                            {
+                                int num = checkMinMax(getGenerator().nextInt(v.getMaximum() + 1), v);
+                                
+                                for (int i = 0; i < num; i++)
+                                {
+                                    if (hasRoom(max, result.size()))
+                                    {
+                                        if (v.getDataValue() > 0)
+                                        {
+                                            result.add(new ItemStack(m.getId(), 1, (short) 0, new Byte(v.getDataValue())));
+                                        }
+                                        else
+                                        {
+                                            result.add(new ItemStack(m, 1));
+                                        }
+                                    }
+                                }                            
+                            }                            
+                        }
+                    }
+                    else
+                    {
+                        ChanceValues v = new ChanceValues(c.getString(path + key, "0"));
                         double opt = checkBounds(v.getPercentage());
+
                         if (rollPassed(opt))
                         {
-                            int num = checkMinMax(getGenerator().nextInt(v.getMaximum() + 1), v);
+                            int num = checkMinMax(getGenerator().nextInt(
+                                v.getMaximum() + 1), v);
                             
                             for (int i = 0; i < num; i++)
                             {
                                 if (hasRoom(max, result.size()))
                                 {
-                                    result.add(new ItemStack(m, 1));
+                                    if (v.getDataValue() > 0)
+                                    {
+                                        result.add(new ItemStack(m.getId(), 1, (short) 0, new Byte(v.getDataValue())));
+                                    }
+                                    else
+                                    {
+                                        result.add(new ItemStack(m, 1));
+                                    }
                                 }
                             }                            
                         }                            
                     }
                 }
-                else
+                else 
                 {
-                    ChanceValues v = new ChanceValues(c.getString(path + key, "0"));
-                    double opt = checkBounds(v.getPercentage());
-                    if (rollPassed(opt))
+                    if (!_materialErr)
                     {
-                        int num = checkMinMax(getGenerator().nextInt(
-                            v.getMaximum() + 1), v);
-                        
-                        for (int i = 0; i < num; i++)
-                        {
-                            if (hasRoom(max, result.size()))
-                            {
-                                result.add(new ItemStack(m, 1));
-                            }
-                        }                            
-                    }                            
-                }                    
+                        System.out.println("DropBonus : Configuration file issue : Unable to find a material named " + key);
+                        _materialErr = true;
+                    }
+                }
             }
         }
     }    
