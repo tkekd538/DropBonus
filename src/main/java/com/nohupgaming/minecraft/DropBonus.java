@@ -1,9 +1,13 @@
 package com.nohupgaming.minecraft;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.World.Environment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
 import org.bukkit.plugin.PluginManager;
@@ -20,12 +24,14 @@ public class DropBonus extends JavaPlugin
     private DropBonusBlockListener _bl;
     private DropBonusEntityListener _el;
     private PermissionHandler _permissions;
+    private HashMap<String, Configuration> _configs;
     private boolean _iConomy = false;
     
     public DropBonus()
     {
         _bl = new DropBonusBlockListener(this);
-        _el = new DropBonusEntityListener(this);
+        _el = new DropBonusEntityListener(this);        
+        _configs = new HashMap<String, Configuration>();
         _permissions = null;
     }
     
@@ -125,4 +131,27 @@ public class DropBonus extends JavaPlugin
             }
         }
     }
+    
+    public Configuration getWorldConfiguration(Player pl) 
+    {
+        String wName = pl.getWorld().getName();
+        if (!_configs.keySet().contains(wName))
+        {
+            String path = wName + ".config.yml";
+            File f = new File(getDataFolder(), path);
+            
+            Configuration c = null;
+            
+            if (f.exists())
+            {
+                c = new Configuration(f);
+                c.load();                
+            }
+            _configs.put(wName, c);
+        }
+        
+        Configuration wcfg = _configs.get(wName);
+        return  wcfg == null ? getConfiguration() : wcfg;
+    }
+    
 }

@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
@@ -65,22 +64,22 @@ public class DropBonusUtil
         }
     }
     
-    public static boolean isOverride(DropBonus p, Object target)
+    public static boolean isOverride(DropBonus p, Player pl, Object target)
     {
-        return p.getConfiguration().getBoolean(
+        return p.getWorldConfiguration(pl).getBoolean(
             determinePath(target, Constants.BONUS_OVERRIDE_SUFFIX), false);
     }
     
     public static boolean hasBonus(DropBonus p, Player pl, Object target)
     {        
         String path = determinePath(target, Constants.BONUS_PROBABILITY_SUFFIX);
-        double opt = checkBounds(p.getConfiguration().getDouble(path, 0));        
+        double opt = checkBounds(p.getWorldConfiguration(pl).getDouble(path, 0));
         return hasPermission(p, pl, path) && rollPassed(opt);
     }
     
     public static List<ItemStack> generateBonus(DropBonus p, Player pl, Object target)
     {
-        Configuration c = p.getConfiguration();
+        Configuration c = p.getWorldConfiguration(pl);
         List<ItemStack> result = new ArrayList<ItemStack>();        
         String path = null;
         
@@ -120,7 +119,7 @@ public class DropBonusUtil
         if (p.hasIConomy()) affectBank(c, pl, path);        
                 
         // Determine overall level bonuses
-        path = determinePath(target, Constants.BONUS_CHANCES_BRIDGE);                
+        path = determinePath(target, Constants.BONUS_CHANCES_BRIDGE);
         if (hasPermission(p, pl, path))
         {
             buildBonus(c, path, max, result);
@@ -228,17 +227,15 @@ public class DropBonusUtil
                         Account account = iConomy.getBank().getAccount(pl.getName());
                         account.add(amt);
                         account.save();
-                       
-                        if(amt > 0) 
-                        {
-                            pl.sendMessage(ChatColor.GREEN + "You are rewarded " 
-                                + ChatColor.WHITE + iConomy.getBank().format(amt));
-                        } 
-                        else if(amt < 0) 
-                        {
-                            pl.sendMessage(ChatColor.RED + "You are penalized " 
-                                + ChatColor.WHITE + iConomy.getBank().format(amt));
-                        }
+                    }
+                    
+                    if (amt != 0)
+                    {
+                        path = c.getString(Constants.MESSAGES_PREFIX + 
+                            Constants.BANK_NODE + (amt > 0 ? 
+                                Constants.MESSAGES_BANKPOSITIVE_SUFFIX :
+                                Constants.MESSAGES_BANKNEGATIVE_SUFFIX));
+                        alertBank(c, pl, path, amt);
                     }
                 }
             }
@@ -250,6 +247,15 @@ public class DropBonusUtil
                 System.out.println("DropBonus : Unable to apply bank bonuses : " + e.getMessage());
                 _bankErr = true;
             }
+        }
+    }
+    
+    private static void alertBank(Configuration c, Player pl, String path, int amt)
+    {
+        String msg = c.getString(path);
+        if (msg != null)
+        {
+            pl.sendMessage(msg.replaceAll("\\[amount\\]", Integer.toString(amt)));
         }
     }
     
