@@ -19,7 +19,7 @@
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>bukkit</artifactId>
-      <version>0.0.1-423</version>
+      <version>0.0.1-432</version>
       <scope>compile</scope>      
     </dependency>
     <dependency>
