@@ -11,7 +11,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 
 import com.nohupgaming.minecraft.DropBonus;
-import com.nohupgaming.minecraft.DropBonusUtil;
+import com.nohupgaming.minecraft.util.DropBonusUtil;
 
 public class DropBonusEntityListener extends EntityListener 
 {
@@ -51,24 +51,26 @@ public class DropBonusEntityListener extends EntityListener
     public void onEntityDeath(EntityDeathEvent event) 
     {
         Entity e = event.getEntity();
+        Player pl = null;
         
         if (_killed.containsKey(e))
         {
             Entity dmgBy = _killed.get(e);
-            Player pl = dmgBy instanceof Player ? (Player) dmgBy : null; 
+            pl = dmgBy instanceof Player ? (Player) dmgBy : null; 
             if (DropBonusUtil.hasBonus(_plugin, pl, e))
             {
                 DropBonusUtil.generateBonus(_plugin, 
                     pl, e);
             }
             
-            if (DropBonusUtil.isOverride(_plugin, pl, e))
-            {
-                event.getDrops().clear();
-            }
-
             _killed.remove(e);
         }
+
+        if (DropBonusUtil.isOverride(_plugin, pl, e))
+        {
+            event.getDrops().clear();
+        }
+
     }
     
 }

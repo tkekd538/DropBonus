@@ -8,7 +8,7 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockListener;
 
 import com.nohupgaming.minecraft.DropBonus;
-import com.nohupgaming.minecraft.DropBonusUtil;
+import com.nohupgaming.minecraft.util.DropBonusUtil;
 
 public class DropBonusBlockListener extends BlockListener 
 {

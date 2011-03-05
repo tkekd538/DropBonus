@@ -18,6 +18,7 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nohupgaming.minecraft.listener.block.DropBonusBlockListener;
 import com.nohupgaming.minecraft.listener.entity.DropBonusEntityListener;
+import com.nohupgaming.minecraft.util.DropBonusConstants;
 
 public class DropBonus extends JavaPlugin 
 {
@@ -53,13 +54,13 @@ public class DropBonus extends JavaPlugin
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);        
         
-        if (pm.getPlugin(Constants.PERMISSIONS) != null)
+        if (pm.getPlugin(DropBonusConstants.PERMISSIONS) != null)
         {
             Permissions perm = (Permissions) pm.getPlugin(Permissions.name);
             _permissions = perm.getHandler(); 
         }
         
-        if (pm.getPlugin(Constants.ICONOMY) != null)
+        if (pm.getPlugin(DropBonusConstants.ICONOMY) != null)
         {
             _iConomy = true;
         }
@@ -82,47 +83,47 @@ public class DropBonus extends JavaPlugin
         Configuration c = getConfiguration();
         if (c != null)
         {
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() + 
-                Constants.BONUS_PROBABILITY_SUFFIX, 20);
+                DropBonusConstants.BONUS_PROBABILITY_SUFFIX, 20);
             
             List<Double> vals = new ArrayList<Double>();
             vals.add(new Double(100));
             vals.add(new Double(100));                        
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() +
-                Constants.BONUS_CHANCES_BRIDGE + 
+                DropBonusConstants.BONUS_CHANCES_BRIDGE + 
                 Material.COBBLESTONE.toString().toLowerCase(), vals);
             
             String valarr = ".1 0 1";
             
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() +
-                Constants.BONUS_CHANCES_BRIDGE + 
+                DropBonusConstants.BONUS_CHANCES_BRIDGE + 
                 Material.OBSIDIAN.toString().toLowerCase(), valarr);
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() + 
-                Constants.BONUS_OVERRIDE_SUFFIX, false);
+                DropBonusConstants.BONUS_OVERRIDE_SUFFIX, false);
             
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() +
-                Constants.BONUS_TOOL_BRIDGE +
+                DropBonusConstants.BONUS_TOOL_BRIDGE +
                 Material.DIAMOND_PICKAXE.toString().toLowerCase() + 
-                Constants.BONUS_CHANCES_BRIDGE +
+                DropBonusConstants.BONUS_CHANCES_BRIDGE +
                 Material.STONE.toString().toLowerCase()
                 , 100);
 
-            c.setProperty(Constants.BONUS_PREFIX + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
                 Material.STONE.toString().toLowerCase() +
-                Constants.BONUS_MAXNUMBER_SUFFIX
+                DropBonusConstants.BONUS_MAXNUMBER_SUFFIX
                 , -1);
             
-            c.setProperty(Constants.BONUS_PREFIX + 
-                Constants.CRAFTCHICKEN +
-                Constants.BONUS_PROBABILITY_SUFFIX, 99.9);
-            c.setProperty(Constants.BONUS_PREFIX + 
-                Constants.CRAFTCHICKEN +
-                Constants.BONUS_CHANCES_BRIDGE + 
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
+                DropBonusConstants.CRAFTCHICKEN +
+                DropBonusConstants.BONUS_PROBABILITY_SUFFIX, 99.9);
+            c.setProperty(DropBonusConstants.BONUS_PREFIX + 
+                DropBonusConstants.CRAFTCHICKEN +
+                DropBonusConstants.BONUS_CHANCES_BRIDGE + 
                 Material.EGG.toString().toLowerCase(), 99.9);
 
             if (!c.save())
@@ -134,23 +135,29 @@ public class DropBonus extends JavaPlugin
     
     public Configuration getWorldConfiguration(Player pl) 
     {
-        String wName = pl.getWorld().getName();
-        if (!_configs.keySet().contains(wName))
+        String wName = null;
+        
+        if (pl != null)
         {
-            String path = wName + ".config.yml";
-            File f = new File(getDataFolder(), path);
-            
-            Configuration c = null;
-            
-            if (f.exists())
+            wName = pl.getWorld().getName();
+            if (!_configs.keySet().contains(wName))
             {
-                c = new Configuration(f);
-                c.load();                
+                String path = wName + ".config.yml";
+                File f = new File(getDataFolder(), path);
+                
+                Configuration c = null;
+                
+                if (f.exists())
+                {
+                    c = new Configuration(f);
+                    c.load();                
+                }
+                _configs.put(wName, c);
             }
-            _configs.put(wName, c);
         }
         
-        Configuration wcfg = _configs.get(wName);
+        Configuration wcfg = null;
+        if (wName != null) _configs.get(wName);
         return  wcfg == null ? getConfiguration() : wcfg;
     }
     

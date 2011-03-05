@@ -1,6 +1,6 @@
-package com.nohupgaming.minecraft;
+package com.nohupgaming.minecraft.util;
 
-public class Constants 
+public class DropBonusConstants 
 {
     public static String BANK_NODE = "bank";
     

@@ -1,4 +1,4 @@
-package com.nohupgaming.minecraft;
+package com.nohupgaming.minecraft.util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +14,7 @@ import org.bukkit.util.config.Configuration;
 
 import com.nijiko.coelho.iConomy.iConomy;
 import com.nijiko.coelho.iConomy.system.Account;
+import com.nohupgaming.minecraft.DropBonus;
 
 public class DropBonusUtil 
 {
@@ -34,8 +35,7 @@ public class DropBonusUtil
             StringTokenizer st = new StringTokenizer(s, " ", false);
             _pct = st.hasMoreTokens() ? Double.parseDouble(st.nextToken()) : 0;
             
-            int testMin = st.hasMoreTokens() ? Integer.parseInt(st.nextToken()) : 1;
-            _min = testMin < 0 ? 0 : testMin;
+            _min = st.hasMoreTokens() ? Integer.parseInt(st.nextToken()) : 1;
             
             int testMax = st.hasMoreTokens() ? Integer.parseInt(st.nextToken()) : 1; 
             _max = testMax < _min ? _min : testMax;             
@@ -62,17 +62,22 @@ public class DropBonusUtil
         {
             return _data;
         }
+        
+        public String toString()
+        {
+            return "Percentage: " + _pct + "; Minimum: " + _min + "; Maximum: " + _max + "; Data: " +_data;
+        }
     }
     
     public static boolean isOverride(DropBonus p, Player pl, Object target)
     {
         return p.getWorldConfiguration(pl).getBoolean(
-            determinePath(target, Constants.BONUS_OVERRIDE_SUFFIX), false);
+            determinePath(target, DropBonusConstants.BONUS_OVERRIDE_SUFFIX), false);
     }
     
     public static boolean hasBonus(DropBonus p, Player pl, Object target)
     {        
-        String path = determinePath(target, Constants.BONUS_PROBABILITY_SUFFIX);
+        String path = determinePath(target, DropBonusConstants.BONUS_PROBABILITY_SUFFIX);
         double opt = checkBounds(p.getWorldConfiguration(pl).getDouble(path, 0));
         return hasPermission(p, pl, path) && rollPassed(opt);
     }
@@ -83,43 +88,46 @@ public class DropBonusUtil
         List<ItemStack> result = new ArrayList<ItemStack>();        
         String path = null;
         
-        path = determinePath(target, Constants.BONUS_MAXNUMBER_SUFFIX);
+        path = determinePath(target, DropBonusConstants.BONUS_MAXNUMBER_SUFFIX);
         // Maximum number of bonuses that can be met
         int max = c.getInt(path, -1);
         
         // Determine tool-specific bonuses
         if (pl != null)
         {            
-            path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+            path = determinePath(target, DropBonusConstants.BONUS_TOOL_BRIDGE + 
                 pl.getItemInHand().getType().toString().toLowerCase());
             
             if (hasPermission(p, pl, path))
             {
-                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                path = determinePath(target, DropBonusConstants.BONUS_TOOL_BRIDGE + 
                     pl.getItemInHand().getType().toString().toLowerCase() + 
-                    Constants.BONUS_COINS_SUFFIX);
+                    DropBonusConstants.BONUS_COINS_SUFFIX);
                 
                 // Determine tool-specific bank adjustment
-                if (p.hasIConomy()) affectBank(c, pl, path);
+                if (p.hasIConomy()) 
+                {
+                    affectBank(c, pl, path);
+                }
                 
-                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                path = determinePath(target, DropBonusConstants.BONUS_TOOL_BRIDGE + 
                     pl.getItemInHand().getType().toString().toLowerCase() + 
-                    Constants.BONUS_CHANCES_BRIDGE);
+                    DropBonusConstants.BONUS_CHANCES_BRIDGE);
                 buildBonus(c, path, max, result);
                 
-                path = determinePath(target, Constants.BONUS_TOOL_BRIDGE + 
+                path = determinePath(target, DropBonusConstants.BONUS_TOOL_BRIDGE + 
                     pl.getItemInHand().getType().toString().toLowerCase() + 
-                    Constants.BONUS_TOOLDAMAGE_SUFFIX);
+                    DropBonusConstants.BONUS_TOOLDAMAGE_SUFFIX);
                 affectTool(c, pl, path);
             }
         }
         
         // Determine overall level bank adjustment
-        path = determinePath(target, Constants.BONUS_COINS_SUFFIX);        
+        path = determinePath(target, DropBonusConstants.BONUS_COINS_SUFFIX);        
         if (p.hasIConomy()) affectBank(c, pl, path);        
                 
         // Determine overall level bonuses
-        path = determinePath(target, Constants.BONUS_CHANCES_BRIDGE);
+        path = determinePath(target, DropBonusConstants.BONUS_CHANCES_BRIDGE);
         if (hasPermission(p, pl, path))
         {
             buildBonus(c, path, max, result);
@@ -147,13 +155,13 @@ public class DropBonusUtil
 
         if (o instanceof Block)
         {
-            path = Constants.BONUS_PREFIX + 
+            path = DropBonusConstants.BONUS_PREFIX + 
                 ((Block) o).getType().toString().toLowerCase() + 
                 suffix;
         }
         else if (o instanceof Entity)
         {
-            path = Constants.BONUS_PREFIX + 
+            path = DropBonusConstants.BONUS_PREFIX + 
                 ((Entity) o).toString().toLowerCase() + 
                 suffix;
         }
@@ -184,6 +192,12 @@ public class DropBonusUtil
     {
         double roll = getGenerator().nextDouble() * 100;                
         return (val > 0 && roll > 0 && roll <= val);
+    }
+    
+    private static int randomInt(int low, int high)
+    {
+        int x = getGenerator().nextInt(Math.abs(high - low) + 1);
+        return (Math.min(low, high) + x);
     }
     
     private static boolean hasPermission(DropBonus p, Player pl, String path)
@@ -221,21 +235,23 @@ public class DropBonusUtil
                 double opt = checkBounds(v.getPercentage());
                 if (rollPassed(opt))
                 {
-                    int amt = checkMinMax(getGenerator().nextInt(v.getMaximum() + 1), v);
                     if(iConomy.getBank().hasAccount(pl.getName())) 
                     {
+                        int amt = checkMinMax(randomInt(v.getMinimum(), v.getMaximum()), v);
+                        
                         Account account = iConomy.getBank().getAccount(pl.getName());
                         account.add(amt);
                         account.save();
-                    }
-                    
-                    if (amt != 0)
-                    {
-                        path = c.getString(Constants.MESSAGES_PREFIX + 
-                            Constants.BANK_NODE + (amt > 0 ? 
-                                Constants.MESSAGES_BANKPOSITIVE_SUFFIX :
-                                Constants.MESSAGES_BANKNEGATIVE_SUFFIX));
-                        alertBank(c, pl, path, amt);
+                        
+                        
+                        if (amt != 0)
+                        {
+                            path = DropBonusConstants.MESSAGES_PREFIX + 
+                                DropBonusConstants.BANK_NODE + (amt > 0 ? 
+                                    DropBonusConstants.MESSAGES_BANKPOSITIVE_SUFFIX :
+                                    DropBonusConstants.MESSAGES_BANKNEGATIVE_SUFFIX);
+                            alertBank(c, pl, path, amt);
+                        }                                                
                     }
                 }
             }
@@ -288,7 +304,7 @@ public class DropBonusUtil
                             
                             if (rollPassed(opt))
                             {
-                                int num = checkMinMax(getGenerator().nextInt(v.getMaximum() + 1), v);
+                                int num = checkMinMax(randomInt(v.getMinimum(), v.getMaximum()), v);
                                 
                                 for (int i = 0; i < num; i++)
                                 {
@@ -314,8 +330,7 @@ public class DropBonusUtil
 
                         if (rollPassed(opt))
                         {
-                            int num = checkMinMax(getGenerator().nextInt(
-                                v.getMaximum() + 1), v);
+                            int num = checkMinMax(randomInt(v.getMinimum(), v.getMaximum()), v);
                             
                             for (int i = 0; i < num; i++)
                             {
