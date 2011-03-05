@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Material;
-import org.bukkit.World.Environment;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
