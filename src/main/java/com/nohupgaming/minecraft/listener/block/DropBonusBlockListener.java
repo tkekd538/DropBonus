@@ -25,19 +25,22 @@ public class DropBonusBlockListener extends BlockListener
     @Override
     public void onBlockBreak(BlockBreakEvent event) 
     {        
-        Block b = event.getBlock();
-        Player pl = event.getPlayer();
-        
-        if (DropBonusUtil.hasBonus(_plugin, pl, b) &&
-            !_plugin.isPlacedBlock(b))
+        if (!event.isCancelled())
         {
-            DropBonusUtil.generateBonus(_plugin, pl, b);
+            Block b = event.getBlock();
+            Player pl = event.getPlayer();
+            
+            if (DropBonusUtil.hasBonus(_plugin, pl, b) &&
+                !_plugin.isPlacedBlock(b))
+            {
+                DropBonusUtil.generateBonus(_plugin, pl, b);
+            }
+            
+            if (DropBonusUtil.isOverride(_plugin, pl, b))
+            {
+                b.setType(Material.AIR);
+            }
         }
-        
-        if (DropBonusUtil.isOverride(_plugin, pl, b))
-        {
-            b.setType(Material.AIR);
-        }        
     }
     
     @Override

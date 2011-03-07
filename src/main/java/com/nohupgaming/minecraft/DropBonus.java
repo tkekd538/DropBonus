@@ -52,7 +52,7 @@ public class DropBonus extends JavaPlugin
         }
         
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
+        pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Highest, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.BLOCK_PLACED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
