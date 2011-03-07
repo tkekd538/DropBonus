@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Event.Priority;
 import org.bukkit.event.Event.Type;
@@ -25,6 +27,7 @@ public class DropBonus extends JavaPlugin
     private DropBonusEntityListener _el;
     private PermissionHandler _permissions;
     private HashMap<String, Configuration> _configs;
+    private List<Block> _placed;   
     private boolean _iConomy = false;
     
     public DropBonus()
@@ -32,6 +35,7 @@ public class DropBonus extends JavaPlugin
         _bl = new DropBonusBlockListener(this);
         _el = new DropBonusEntityListener(this);        
         _configs = new HashMap<String, Configuration>();
+        _placed = new ArrayList<Block>();
         _permissions = null;
     }
     
@@ -50,6 +54,7 @@ public class DropBonus extends JavaPlugin
         PluginManager pm = getServer().getPluginManager();
         pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Normal, this);
         pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
+        pm.registerEvent(Type.BLOCK_PLACED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);        
         
@@ -125,6 +130,12 @@ public class DropBonus extends JavaPlugin
                 DropBonusConstants.BONUS_CHANCES_BRIDGE + 
                 Material.EGG.toString().toLowerCase(), 99.9);
 
+            c.setProperty(DropBonusConstants.BLOCK_NODE + 
+                DropBonusConstants.BLOCK_COOLDOWN_SUFFIX, 0);
+
+            c.setProperty(DropBonusConstants.CREATURE_NODE + 
+                DropBonusConstants.BONUS_KILLER_SUFFIX, 0);
+            
             if (!c.save())
             {
                 getServer().getLogger().warning("Unable to persist configuration files, changes will not be saved.");
@@ -160,4 +171,18 @@ public class DropBonus extends JavaPlugin
         return  wcfg == null ? getConfiguration() : wcfg;
     }
     
+    public void addPlacedBlock(Block b)
+    {
+        _placed.add(b);
+    }
+    
+    public void removePlacedBlock(Block b)
+    {
+        _placed.remove(b);
+    }
+    
+    public boolean isPlacedBlock(Block b)
+    {
+        return _placed.contains(b);
+    }
 }

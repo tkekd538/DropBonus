@@ -82,6 +82,21 @@ public class DropBonusUtil
         return hasPermission(p, pl, path) && rollPassed(opt);
     }
     
+    public static boolean requiresKiller(DropBonus p, Player pl, Object target)
+    {
+        boolean result = false; 
+        String path = determinePath(target, DropBonusConstants.BONUS_KILLER_SUFFIX);
+        result = p.getWorldConfiguration(pl).getBoolean(path, false);
+
+        if (!result)
+        {
+            path = DropBonusConstants.CREATURE_NODE + DropBonusConstants.BONUS_KILLER_SUFFIX;
+            result = p.getWorldConfiguration(pl).getBoolean(path, false);
+        }
+
+        return result;        
+    }
+    
     public static List<ItemStack> generateBonus(DropBonus p, Player pl, Object target)
     {
         Configuration c = p.getWorldConfiguration(pl);
@@ -212,7 +227,7 @@ public class DropBonusUtil
     private static boolean hasRoom(int max, int size)
     {
         return max == -1 || size < max;
-    }
+    }    
     
     private static Random getGenerator()
     {

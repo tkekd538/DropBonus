@@ -53,14 +53,14 @@ public class DropBonusEntityListener extends EntityListener
         Entity e = event.getEntity();
         Player pl = null;
         
-        if (_killed.containsKey(e))
+        if (!DropBonusUtil.requiresKiller(_plugin, pl, e) || 
+            _killed.containsKey(e))
         {
             Entity dmgBy = _killed.get(e);
             pl = dmgBy instanceof Player ? (Player) dmgBy : null; 
             if (DropBonusUtil.hasBonus(_plugin, pl, e))
             {
-                DropBonusUtil.generateBonus(_plugin, 
-                    pl, e);
+                DropBonusUtil.generateBonus(_plugin, pl, e);
             }
             
             _killed.remove(e);
@@ -70,7 +70,6 @@ public class DropBonusEntityListener extends EntityListener
         {
             event.getDrops().clear();
         }
-
     }
     
 }
