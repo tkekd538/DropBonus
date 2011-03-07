@@ -11,6 +11,7 @@ import org.bukkit.event.entity.EntityDeathEvent;
 import org.bukkit.event.entity.EntityListener;
 
 import com.nohupgaming.minecraft.DropBonus;
+import com.nohupgaming.minecraft.util.CreatureKillerExpiration;
 import com.nohupgaming.minecraft.util.DropBonusUtil;
 
 public class DropBonusEntityListener extends EntityListener 
@@ -43,6 +44,8 @@ public class DropBonusEntityListener extends EntityListener
                 !_killed.containsKey(target))
             {
                 _killed.put(target, dmgBy);
+                _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, 
+                    new CreatureKillerExpiration(_killed, target), 100);
             }
         }
     }
