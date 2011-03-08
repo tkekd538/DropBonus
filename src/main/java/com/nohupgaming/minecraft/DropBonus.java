@@ -19,12 +19,14 @@ import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.Permissions;
 import com.nohupgaming.minecraft.listener.block.DropBonusBlockListener;
 import com.nohupgaming.minecraft.listener.entity.DropBonusEntityListener;
+import com.nohupgaming.minecraft.listener.vehicle.DropBonusVehicleListener;
 import com.nohupgaming.minecraft.util.DropBonusConstants;
 
 public class DropBonus extends JavaPlugin 
 {
     private DropBonusBlockListener _bl;
     private DropBonusEntityListener _el;
+    private DropBonusVehicleListener _vl;
     private PermissionHandler _permissions;
     private HashMap<String, Configuration> _configs;
     private List<Block> _placed;   
@@ -33,7 +35,8 @@ public class DropBonus extends JavaPlugin
     public DropBonus()
     {
         _bl = new DropBonusBlockListener(this);
-        _el = new DropBonusEntityListener(this);        
+        _el = new DropBonusEntityListener(this);
+        _vl = new DropBonusVehicleListener(this);
         _configs = new HashMap<String, Configuration>();
         _placed = new ArrayList<Block>();
         _permissions = null;
@@ -56,7 +59,10 @@ public class DropBonus extends JavaPlugin
         pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.BLOCK_PLACED, _bl, Priority.Normal, this);
         pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
-        pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);        
+        pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
+        pm.registerEvent(Type.VEHICLE_COLLISION_BLOCK, _vl, Priority.Normal, this);
+        pm.registerEvent(Type.VEHICLE_DAMAGE, _vl, Priority.Normal, this);
+        
         
         if (pm.getPlugin(DropBonusConstants.PERMISSIONS) != null)
         {
@@ -167,7 +173,7 @@ public class DropBonus extends JavaPlugin
         }
         
         Configuration wcfg = null;
-        if (wName != null) _configs.get(wName);
+        if (wName != null) wcfg = _configs.get(wName);
         return  wcfg == null ? getConfiguration() : wcfg;
     }
     

@@ -78,6 +78,7 @@ public class DropBonusUtil
     public static boolean hasBonus(DropBonus p, Player pl, Object target)
     {        
         String path = determinePath(target, DropBonusConstants.BONUS_PROBABILITY_SUFFIX);
+        System.out.println("Path is " + path);
         double opt = checkBounds(p.getWorldConfiguration(pl).getDouble(path, 0));
         return hasPermission(p, pl, path) && rollPassed(opt);
     }

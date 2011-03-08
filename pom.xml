@@ -5,7 +5,7 @@
   <name>Minecraft - DropBonus</name>
   <groupId>com.nohupgaming.minecraft</groupId>
   <artifactId>DropBonus</artifactId>
-  <version>1.9</version>
+  <version>1.10</version>
   <packaging>jar</packaging>  
 
   <repositories>
@@ -34,14 +34,12 @@
       <version>4.1</version>
       <scope>compile</scope>      
     </dependency>
-<!-- 
     <dependency>
       <groupId>org.bukkit</groupId>
       <artifactId>craftbukkit</artifactId>
       <version>0.0.1-432</version>
       <scope>compile</scope>      
     </dependency>
- -->    
   </dependencies>
     
   <build>
