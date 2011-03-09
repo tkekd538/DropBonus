@@ -43,7 +43,7 @@ public class DropBonus extends JavaPlugin
     
     public void onDisable() 
     {
-        System.out.println("DropBonus has been disabled.");
+        System.out.println("DropBonus " + DropBonusConstants.VERSION + " has been disabled.");
     }
 
     public void onEnable() 
@@ -54,13 +54,12 @@ public class DropBonus extends JavaPlugin
         }
         
         PluginManager pm = getServer().getPluginManager();
-        pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Highest, this);
-        pm.registerEvent(Type.BLOCK_DAMAGED, _bl, Priority.Normal, this);
-        pm.registerEvent(Type.BLOCK_PLACED, _bl, Priority.Normal, this);
-        pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Normal, this);
+        pm.registerEvent(Type.BLOCK_BREAK, _bl, Priority.Monitor, this);
+        pm.registerEvent(Type.BLOCK_PLACED, _bl, Priority.Monitor, this);
+        pm.registerEvent(Type.ENTITY_DAMAGED, _el, Priority.Monitor, this);
         pm.registerEvent(Type.ENTITY_DEATH, _el, Priority.Normal, this);
         pm.registerEvent(Type.VEHICLE_COLLISION_BLOCK, _vl, Priority.Normal, this);
-        pm.registerEvent(Type.VEHICLE_DAMAGE, _vl, Priority.Normal, this);
+        pm.registerEvent(Type.VEHICLE_DAMAGE, _vl, Priority.Monitor, this);
         
         
         if (pm.getPlugin(DropBonusConstants.PERMISSIONS) != null)
@@ -74,7 +73,7 @@ public class DropBonus extends JavaPlugin
             _iConomy = true;
         }
         
-        System.out.println("DropBonus has been enabled.");
+        System.out.println("DropBonus " + DropBonusConstants.VERSION + "  has been enabled.");
     }
     
     public PermissionHandler getPermissionHandler()

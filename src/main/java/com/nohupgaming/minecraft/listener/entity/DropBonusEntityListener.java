@@ -12,7 +12,7 @@ import org.bukkit.event.entity.EntityListener;
 
 import com.nohupgaming.minecraft.DropBonus;
 import com.nohupgaming.minecraft.util.CreatureKillerExpiration;
-import com.nohupgaming.minecraft.util.DropBonusUtil;
+import com.nohupgaming.minecraft.util.DropBonusEvaluator;
 
 public class DropBonusEntityListener extends EntityListener 
 {
@@ -28,24 +28,27 @@ public class DropBonusEntityListener extends EntityListener
     @Override
     public void onEntityDamage(EntityDamageEvent event) 
     {
-        if (event.getEntity() instanceof LivingEntity)
+        if (!event.isCancelled())
         {
-            LivingEntity target = ((LivingEntity) event.getEntity());
-            Entity dmgBy = null;
-            
-            if (event instanceof EntityDamageByEntityEvent)
+            if (event.getEntity() instanceof LivingEntity)
             {
-                dmgBy = ((EntityDamageByEntityEvent) event).getDamager();                
-            }
-            
-            if (target.getHealth()  > 0 &&
-                target.getHealth() <= event.getDamage() &&
-                event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) &&
-                !_killed.containsKey(target))
-            {
-                _killed.put(target, dmgBy);
-                _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, 
-                    new CreatureKillerExpiration(_killed, target), 100);
+                LivingEntity target = ((LivingEntity) event.getEntity());
+                Entity dmgBy = null;
+                
+                if (event instanceof EntityDamageByEntityEvent)
+                {
+                    dmgBy = ((EntityDamageByEntityEvent) event).getDamager();                
+                }
+                
+                if (target.getHealth()  > 0 &&
+                    target.getHealth() <= event.getDamage() &&
+                    event.getCause().equals(EntityDamageEvent.DamageCause.ENTITY_ATTACK) &&
+                    !_killed.containsKey(target))
+                {
+                    _killed.put(target, dmgBy);
+                    _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, 
+                        new CreatureKillerExpiration(_killed, target), 100);
+                }
             }
         }
     }
@@ -55,21 +58,22 @@ public class DropBonusEntityListener extends EntityListener
     {
         Entity e = event.getEntity();
         Player pl = null;
+        DropBonusEvaluator eval = new DropBonusEvaluator(_plugin, pl, e);
         
-        if (!DropBonusUtil.requiresKiller(_plugin, pl, e) || 
+        if (!eval.requiresKiller() || 
             _killed.containsKey(e))
         {
             Entity dmgBy = _killed.get(e);
             pl = dmgBy instanceof Player ? (Player) dmgBy : null; 
-            if (DropBonusUtil.hasBonus(_plugin, pl, e))
+            if (eval.hasBonus())
             {
-                DropBonusUtil.generateBonus(_plugin, pl, e);
+                eval.generateBonus();
             }
             
             _killed.remove(e);
         }
 
-        if (DropBonusUtil.isOverride(_plugin, pl, e))
+        if (eval.isOverride())
         {
             event.getDrops().clear();
         }

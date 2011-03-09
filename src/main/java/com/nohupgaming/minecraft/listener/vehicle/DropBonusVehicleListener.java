@@ -14,7 +14,7 @@ import org.bukkit.event.vehicle.VehicleDamageEvent;
 import org.bukkit.event.vehicle.VehicleListener;
 
 import com.nohupgaming.minecraft.DropBonus;
-import com.nohupgaming.minecraft.util.DropBonusUtil;
+import com.nohupgaming.minecraft.util.DropBonusEvaluator;
 
 public class DropBonusVehicleListener extends VehicleListener 
 {
@@ -28,23 +28,27 @@ public class DropBonusVehicleListener extends VehicleListener
     @Override
     public void onVehicleDamage(VehicleDamageEvent event) 
     {
-        Vehicle v = event.getVehicle();
-        Player pl = event.getAttacker() instanceof Player ?  
-            pl = (Player) event.getAttacker() : null;
-
-        int dmg = 0;
-        
-        if (v instanceof Boat)
+        if (!event.isCancelled())
         {
-            dmg = ((EntityBoat)((CraftBoat) v).getHandle()).a;            
-        } else if (v instanceof Minecart) {
-            dmg = ((EntityMinecart)((CraftMinecart) v).getHandle()).a;            
-        } 
-        
-        if (((dmg + event.getDamage()) * 10) > 40 &&
-            DropBonusUtil.hasBonus(_plugin, pl, v))
-        {
-            DropBonusUtil.generateBonus(_plugin, pl, v);
+            Vehicle v = event.getVehicle();
+            Player pl = event.getAttacker() instanceof Player ?  
+                pl = (Player) event.getAttacker() : null;
+            DropBonusEvaluator eval = new DropBonusEvaluator(_plugin, pl, v);
+    
+            int dmg = 0;
+            
+            if (v instanceof Boat)
+            {
+                dmg = ((EntityBoat)((CraftBoat) v).getHandle()).a;            
+            } else if (v instanceof Minecart) {
+                dmg = ((EntityMinecart)((CraftMinecart) v).getHandle()).a;            
+            } 
+            
+            if (((dmg + event.getDamage()) * 10) > 40 &&
+                eval.hasBonus())
+            {
+                eval.generateBonus();
+            }
         }
     }
     
@@ -58,9 +62,10 @@ public class DropBonusVehicleListener extends VehicleListener
 
         if (v instanceof Boat && speed > 0.15) 
         {
-            if (DropBonusUtil.hasBonus(_plugin, pl, v))
+            DropBonusEvaluator eval = new DropBonusEvaluator(_plugin, pl, v);
+            if (eval.hasBonus())
             {
-                DropBonusUtil.generateBonus(_plugin, pl, v);
+                eval.generateBonus();
             }
         }
     }

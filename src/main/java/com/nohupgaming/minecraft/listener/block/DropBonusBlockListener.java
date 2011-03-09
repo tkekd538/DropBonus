@@ -11,7 +11,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import com.nohupgaming.minecraft.DropBonus;
 import com.nohupgaming.minecraft.util.BlockCooldownExpiration;
 import com.nohupgaming.minecraft.util.DropBonusConstants;
-import com.nohupgaming.minecraft.util.DropBonusUtil;
+import com.nohupgaming.minecraft.util.DropBonusEvaluator;
 
 public class DropBonusBlockListener extends BlockListener 
 {
@@ -29,14 +29,15 @@ public class DropBonusBlockListener extends BlockListener
         {
             Block b = event.getBlock();
             Player pl = event.getPlayer();
+            DropBonusEvaluator eval = new DropBonusEvaluator(_plugin, pl, b);
             
-            if (DropBonusUtil.hasBonus(_plugin, pl, b) &&
+            if (eval.hasBonus() &&
                 !_plugin.isPlacedBlock(b))
             {
-                DropBonusUtil.generateBonus(_plugin, pl, b);
+                eval.generateBonus();
             }
             
-            if (DropBonusUtil.isOverride(_plugin, pl, b))
+            if (eval.isOverride())
             {
                 b.setType(Material.AIR);
             }
@@ -46,14 +47,17 @@ public class DropBonusBlockListener extends BlockListener
     @Override
     public void onBlockPlace(BlockPlaceEvent event) 
     {
-        String path = DropBonusConstants.BLOCK_NODE + 
-            DropBonusConstants.BLOCK_COOLDOWN_SUFFIX;
-        int cooldown = _plugin.getConfiguration().getInt(path, 0);
-        if (cooldown > 0)
+        if (!event.isCancelled())
         {
-            Block b = event.getBlock();
-            _plugin.addPlacedBlock(b);
-            _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, new BlockCooldownExpiration(_plugin, b), cooldown);
+            String path = DropBonusConstants.BLOCK_NODE + 
+                DropBonusConstants.BLOCK_COOLDOWN_SUFFIX;
+            int cooldown = _plugin.getConfiguration().getInt(path, 0);
+            if (cooldown > 0)
+            {
+                Block b = event.getBlock();
+                _plugin.addPlacedBlock(b);
+                _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, new BlockCooldownExpiration(_plugin, b), cooldown);
+            }
         }
     }
 }
