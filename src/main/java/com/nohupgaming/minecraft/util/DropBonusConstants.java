@@ -2,7 +2,7 @@ package com.nohupgaming.minecraft.util;
 
 public class DropBonusConstants 
 {
-    public static String VERSION = "v1.10";
+    public static String VERSION = "v2.0";
     
     public static String BANK_NODE = "bank";
     public static String BLOCK_NODE = "block";
