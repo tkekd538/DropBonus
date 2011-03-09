@@ -221,7 +221,7 @@ public class DropBonusEvaluator
                     {
                         for (Object prop : c.getList(path + key))
                         {
-                            buildItemStack(m, (String) prop, max);
+                            buildItemStack(m, prop.toString(), max);
                         }
                     }
                     else
