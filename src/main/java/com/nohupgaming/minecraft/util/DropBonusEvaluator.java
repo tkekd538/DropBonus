@@ -231,7 +231,7 @@ public class DropBonusEvaluator
                 }
                 else 
                 {
-                    if (DropBonusUtil.getMaterialError())
+                    if (m == null && !DropBonusUtil.getMaterialError())
                     {
                         System.out.println("DropBonus : Configuration file " + 
                             "issue : Unable to find a material named " + key);
