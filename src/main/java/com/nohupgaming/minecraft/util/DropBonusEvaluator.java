@@ -80,9 +80,9 @@ public class DropBonusEvaluator
                     DropBonusConstants.BONUS_COINS_SUFFIX);
                 
                 // Determine tool-specific bank adjustment
-                if (_plugin.hasIConomy()) 
+                if (_pl != null &&_plugin.hasIConomy()) 
                 {
-                    affectBank(c, _pl, path);
+                    affectBank(c, path);
                 }
                 
                 path = determinePath(_obj, DropBonusConstants.BONUS_TOOL_BRIDGE + 
@@ -99,7 +99,7 @@ public class DropBonusEvaluator
         
         // Determine overall level bank adjustment
         path = determinePath(_obj, DropBonusConstants.BONUS_COINS_SUFFIX);        
-        if (_plugin.hasIConomy()) affectBank(c, _pl, path);        
+        if (_pl != null && _plugin.hasIConomy()) affectBank(c, path);        
                 
         // Determine overall level bonuses
         path = determinePath(_obj, DropBonusConstants.BONUS_CHANCES_BRIDGE);
@@ -146,7 +146,7 @@ public class DropBonusEvaluator
         return max == -1 || size < max;
     }    
     
-    private void affectBank(Configuration c, Player pl, String path)
+    private void affectBank(Configuration c, String path)
     {
         try
         {
@@ -157,11 +157,11 @@ public class DropBonusEvaluator
                 double opt = DropBonusUtil.checkBounds(v.getPercentage());
                 if (DropBonusUtil.rollPassed(opt))
                 {
-                    if(iConomy.getBank().hasAccount(pl.getName())) 
+                    if(iConomy.getBank().hasAccount(_pl.getName())) 
                     {
                         int amt = DropBonusUtil.checkMinMax(v);
                         
-                        Account account = iConomy.getBank().getAccount(pl.getName());
+                        Account account = iConomy.getBank().getAccount(_pl.getName());
                         account.add(amt);
                         account.save();
                         
@@ -172,7 +172,7 @@ public class DropBonusEvaluator
                                 DropBonusConstants.BANK_NODE + (amt > 0 ? 
                                     DropBonusConstants.MESSAGES_BANKPOSITIVE_SUFFIX :
                                     DropBonusConstants.MESSAGES_BANKNEGATIVE_SUFFIX);
-                            alertBank(c, pl, path, amt);
+                            alertBank(c, _pl, path, amt);
                         }                                                
                     }
                 }
