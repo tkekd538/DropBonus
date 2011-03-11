@@ -32,8 +32,14 @@ public class DropBonusEvaluator
     
     public boolean isOverride()
     {
-        return _plugin.getWorldConfiguration(_pl).getBoolean(
+        boolean def_over = _plugin.getWorldConfiguration(_pl).getBoolean(
             determinePath(_obj, DropBonusConstants.BONUS_OVERRIDE_SUFFIX), false);
+        boolean tool_over = _pl != null ?_plugin.getWorldConfiguration(_pl).getBoolean(
+            determinePath(_obj, DropBonusConstants.BONUS_TOOL_BRIDGE + 
+                _pl.getItemInHand().getType().toString().toLowerCase() + 
+                DropBonusConstants.BONUS_OVERRIDE_SUFFIX), false) : false;
+
+        return (def_over || tool_over);
     }
     
     public boolean hasBonus()

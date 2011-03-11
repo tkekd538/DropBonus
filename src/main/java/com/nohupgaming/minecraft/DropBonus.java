@@ -30,6 +30,7 @@ public class DropBonus extends JavaPlugin
     private HashMap<String, Configuration> _configs;
     private List<Block> _placed;   
     private boolean _iConomy = false;
+    private int _coolit = -1;
     
     public DropBonus()
     {
@@ -188,5 +189,16 @@ public class DropBonus extends JavaPlugin
     public boolean isPlacedBlock(Block b)
     {
         return _placed.contains(b);
+    }
+    
+    public int getBlockCooldown()
+    {
+        if (_coolit < 0)
+        {
+            _coolit = getConfiguration().getInt(DropBonusConstants.BLOCK_NODE + 
+                DropBonusConstants.BLOCK_COOLDOWN_SUFFIX, 0);
+        }
+        
+        return _coolit;
     }
 }

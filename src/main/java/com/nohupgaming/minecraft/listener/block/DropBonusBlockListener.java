@@ -47,16 +47,17 @@ public class DropBonusBlockListener extends BlockListener
     @Override
     public void onBlockPlace(BlockPlaceEvent event) 
     {
-        if (!event.isCancelled())
+        if (!event.isCancelled() && _plugin.getBlockCooldown() > 0)
         {
-            String path = DropBonusConstants.BLOCK_NODE + 
-                DropBonusConstants.BLOCK_COOLDOWN_SUFFIX;
-            int cooldown = _plugin.getConfiguration().getInt(path, 0);
-            if (cooldown > 0)
+            String path = DropBonusConstants.BONUS_PREFIX + 
+                event.getBlock().getType().toString().toLowerCase();
+            if (_plugin.getConfiguration().getNode(path) != null)
             {
                 Block b = event.getBlock();
                 _plugin.addPlacedBlock(b);
-                _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(_plugin, new BlockCooldownExpiration(_plugin, b), cooldown);
+                _plugin.getServer().getScheduler().scheduleAsyncDelayedTask(
+                    _plugin, new BlockCooldownExpiration(_plugin, b), 
+                    _plugin.getBlockCooldown());
             }
         }
     }
