@@ -262,7 +262,7 @@ public class DropBonusEvaluator
             {
                 if (hasRoom(max, _result.size()))
                 {
-                    if (v.getDataValue() > 0)
+                    if (v.getDataValue() != 0x0)
                     {
                         _result.add(
                             new ItemStack(m.getId(), 1, 

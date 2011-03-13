@@ -19,7 +19,7 @@ public class ChanceValues
         int testMax = st.hasMoreTokens() ? Integer.parseInt(st.nextToken()) : 1; 
         _max = testMax < _min ? _min : testMax;             
 
-        _data = st.hasMoreTokens() ? Byte.parseByte(st.nextToken()) : 0;             
+        _data = st.hasMoreTokens() ? Byte.parseByte(st.nextToken()) : 0x0;             
     }
     
     public double getPercentage()
