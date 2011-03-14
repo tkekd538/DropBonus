@@ -65,7 +65,7 @@ public class DropBonus extends JavaPlugin
         
         if (pm.getPlugin(DropBonusConstants.PERMISSIONS) != null)
         {
-            Permissions perm = (Permissions) pm.getPlugin(Permissions.name);
+            Permissions perm = (Permissions) pm.getPlugin(DropBonusConstants.PERMISSIONS);
             _permissions = perm.getHandler(); 
         }
         
