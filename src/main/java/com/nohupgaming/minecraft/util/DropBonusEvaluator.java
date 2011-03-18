@@ -31,15 +31,36 @@ public class DropBonusEvaluator
     }
     
     public boolean isOverride()
-    {
-        boolean def_over = _plugin.getWorldConfiguration(_pl).getBoolean(
-            determinePath(_obj, DropBonusConstants.BONUS_OVERRIDE_SUFFIX), false);
-        boolean tool_over = _pl != null ?_plugin.getWorldConfiguration(_pl).getBoolean(
-            determinePath(_obj, DropBonusConstants.BONUS_TOOL_BRIDGE + 
+    {        
+        String defPath = determinePath(_obj, DropBonusConstants.BONUS_OVERRIDE_SUFFIX);        
+        boolean def_over = _plugin.getWorldConfiguration(_pl).getBoolean(defPath, false);
+        
+        if (_pl != null)
+        {
+            String toolPath = determinePath(_obj, DropBonusConstants.BONUS_TOOL_BRIDGE + 
                 _pl.getItemInHand().getType().toString().toLowerCase() + 
-                DropBonusConstants.BONUS_OVERRIDE_SUFFIX), false) : false;
+                DropBonusConstants.BONUS_OVERRIDE_SUFFIX);
+            boolean tool_over = _plugin.getWorldConfiguration(_pl).getBoolean(toolPath, false);
+            
+            if (hasPermission(toolPath))
+            {
+                if (hasPermission(defPath))
+                {
+                    return def_over || tool_over;
+                }
+                else
+                {
+                    return tool_over;
+                }
+            }
+        }
 
-        return (def_over || tool_over);
+        if (hasPermission(defPath))
+        {
+            return def_over;
+        }
+        
+        return false;
     }
     
     public boolean hasBonus()
@@ -154,35 +175,62 @@ public class DropBonusEvaluator
     
     private void affectBank(Configuration c, String path)
     {
+        int ttlamt = 0;
         try
         {
-            if (c.getString(path) != null)
+            if (c.getList(path) != null)
             {
-                ChanceValues v = new ChanceValues(c.getString(path));
-                
-                double opt = DropBonusUtil.checkBounds(v.getPercentage());
-                if (DropBonusUtil.rollPassed(opt))
+                for (Object prop : c.getList(path))
                 {
-                    if(iConomy.getBank().hasAccount(_pl.getName())) 
+                    ChanceValues v = new ChanceValues((String) prop);
+                    double opt = DropBonusUtil.checkBounds(v.getPercentage());
+                    if (DropBonusUtil.rollPassed(opt))
                     {
-                        int amt = DropBonusUtil.checkMinMax(v);
-                        
-                        Account account = iConomy.getBank().getAccount(_pl.getName());
-                        account.add(amt);
-                        account.save();
-                        
-                        
-                        if (amt != 0)
+                        if(iConomy.getBank().hasAccount(_pl.getName())) 
                         {
-                            path = DropBonusConstants.MESSAGES_PREFIX + 
-                                DropBonusConstants.BANK_NODE + (amt > 0 ? 
-                                    DropBonusConstants.MESSAGES_BANKPOSITIVE_SUFFIX :
-                                    DropBonusConstants.MESSAGES_BANKNEGATIVE_SUFFIX);
-                            alertBank(c, _pl, path, amt);
-                        }                                                
+                            int amt = DropBonusUtil.checkMinMax(v);
+                            
+                            Account account = iConomy.getBank().getAccount(_pl.getName());
+                            account.add(amt);
+                            account.save();
+                            
+                            ttlamt += amt;
+                        }
                     }
                 }
             }
+            else
+            {
+                if (c.getString(path) != null)
+                {
+                    ChanceValues v = new ChanceValues(c.getString(path));
+                    
+                    double opt = DropBonusUtil.checkBounds(v.getPercentage());
+                    if (DropBonusUtil.rollPassed(opt))
+                    {
+                        if(iConomy.getBank().hasAccount(_pl.getName())) 
+                        {
+                            int amt = DropBonusUtil.checkMinMax(v);
+                            
+                            Account account = iConomy.getBank().getAccount(_pl.getName());
+                            account.add(amt);
+                            account.save();
+                            
+                            ttlamt += amt;
+                        }
+                    }
+                }
+            }
+                        
+                        
+            if (ttlamt != 0)
+            {
+                path = DropBonusConstants.MESSAGES_PREFIX + 
+                    DropBonusConstants.BANK_NODE + (ttlamt > 0 ? 
+                        DropBonusConstants.MESSAGES_BANKPOSITIVE_SUFFIX :
+                        DropBonusConstants.MESSAGES_BANKNEGATIVE_SUFFIX);
+                alertBank(c, _pl, path, ttlamt);
+            }                                                
         }
         catch (Exception e)
         {
